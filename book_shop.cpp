@@ -7,17 +7,73 @@ using namespace std;
 
 class Books {
     public:
+        //linked lists for author,title,price,publisher, and stock position. 
         list <string> author;
         list <string> title;
         list <int> price;
         list <string> publisher;
         list <int> stock_position;
+        // Checks if the book is available at the store
         void check_availability(string b_title, string b_author);
+        // For staff only, adding books into the system
         void book_entry(string b_title, string b_author, int b_price, string b_publisher, int b_stock_position);
+        // Print out what is in stock
         void show_stock();
+        // Edit info for books that are in stock
+        void edit_stock(string b_title, string b_author, int b_price, string b_publisher, int b_stock_position);
     private:
+        //Private function to traverse all the linked list, might create a list <string, string, int, string, int> book in the future to make things easier
         void traverse_list(int counter);
 };
+
+// Function that allows staff to edit information on books that are in stock based on the title. In the main function, it will ask for the title, then ask for author, price, publisher and stock position for edit.
+void Books::edit_stock(string b_title, string b_author, int b_price, string b_publisher, int b_stock_position) {
+    //Creating iteartor for data type string and int
+    list <string>::iterator ptr;
+    list <int>::iterator ptr2;
+
+    //boolean variable to see whether the book is in stock
+    bool check = false;
+
+    //integer variables to make traversing other linked lists easier
+    int counter = 0, counter1 = 0;
+
+    //Assigning ptr to the head of the title linked list, adding 1 to the counter in each iteartion
+    for(ptr = title.begin(); ptr != title.end(); ptr++){
+        counter++;
+        //if the data is equal to the title, change check from false to true and break out of the for loop
+        if(*ptr == b_title){
+            check = true;
+            break;
+        }
+    }
+    //if check is still false, that means the book does not exist within the system, exit the function
+    if(!check){
+        cout << "Your book is not in our system.\n";
+        return;
+    }
+
+    //Start with author linked list, adding 1 to ptr to move from 1 memory block to another til counter1 is equal to counter
+    for(ptr = author.begin(); counter1 != counter; counter1++){
+        ptr++;
+    }
+    //Deference ptr and assign the b_author to it
+    *ptr = b_author;
+
+    //Pretty much the same as above for the next 3 for loops
+    for(ptr2 = price.begin(); counter1 != 0; counter1--){
+        ptr2++;
+    }
+    *ptr2 = b_price;
+    for(ptr = publisher.begin(); counter1 != counter; counter1++) {
+        ptr++;
+    }
+    *ptr = b_publisher;
+    for(ptr2 = stock_position.begin(); counter1 != 0; counter1--){
+        ptr2++;
+    }
+    *ptr2 = b_stock_position;
+}
 void Books::traverse_list(int counter) {
     int counter2 = 0;
     list <int>::iterator ptr;
@@ -85,7 +141,33 @@ int main() {
     cout << "Welcome to Brax's Book Store (Version 1.0.0)\n" << "Press 1 if you are a staff\n" << "Press 2 if you are a customer\n";
     cin >> num;
     if(num == 1){
-        while(true){
+        cout << "Press 1 if you would like to add books into the system. \nPress 2 if you would like to edit info based on the title of the book.\n";
+        cin >> num;
+        if(num == 1){
+            while(true){
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                cout << "Please enter the title of the book (Press Q then ENTER to exit)\n";
+                getline(cin, title);
+                cout << "Please enter the author of the book\n";
+                getline(cin,author);
+                cout << "Please enter the publisher of the book\n";
+                getline(cin,publisher);
+                cout << "Please enter the price of the book\n";
+                cin >> price;
+                cout << "Please enter the stock position of the book\n";
+                cin >> stock_position;
+                new_bookstore.book_entry(title,author,price,publisher,stock_position);
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                cout << "Will that be all? (Y/N)\n";
+                getline(cin, title);
+                if(title == "Y" || title == "y"){
+                    break;
+                }
+            }
+        }
+        else if(num == 2){
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             cout << "Please enter the title of the book (Press Q then ENTER to exit)\n";
@@ -98,14 +180,11 @@ int main() {
             cin >> price;
             cout << "Please enter the stock position of the book\n";
             cin >> stock_position;
-            new_bookstore.book_entry(title,author,price,publisher,stock_position);
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "Will that be all? (Y/N)\n";
-            getline(cin, title);
-            if(title == "Y" || title == "y"){
-                break;
-            }
+            new_bookstore.edit_stock(title,author,price,publisher,stock_position);
+        }
+        else {
+            cout << "Please try again later.\n";
+            return -1;
         }
         new_bookstore.show_stock();
     }
